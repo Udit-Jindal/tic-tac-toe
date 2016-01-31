@@ -1,0 +1,5 @@
+{
+    "serverAddress": "http://172.16.6.152",
+    "port": "89",
+    "registerUser":"register"
+}

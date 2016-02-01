@@ -11,7 +11,7 @@ module.exports = {
   attributes: {
         userId:'STRING',
         name:'STRING',
-        value:'STRING'
+        socketId:'STRING'
   }
 };
 

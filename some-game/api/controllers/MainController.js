@@ -6,39 +6,112 @@
  */
 
 var MainController = {
+
     register: function (req, res) {
-//        console.log('Reaching server properly');
+
         var params = req.params.all();
-//        var socketId = sails.sockets.id(req);
-        var socket = sails.io.of('/register');
+//        var game = {
+//
+//            gameArray: [
+//                {0: '', 1: '', 2: ''},
+//                {0: '', 1: '', 2: ''},
+//                {0: '', 1: '', 2: ''}
+//            ]
+//        };
+        var user = {id: params.userId, name: params.userName, socketId: ''};
+        var isAjax = params.isAjax;
+        var socketId = null;
 
-        socket.on('connection', function (socket) {
-//            console.log(socket);
-//            socket.emit('hi2nd','Anuj on server');
-//            socket.emit('hi','jitu on server');
+        var socketRequest = sails.io.of('/register');
 
-            socket.on('hi', function (name) {
-                console.log('client called server. 1st hi.='+name);
-            });
+        socketRequest.on('connection', function (socket, err) {
+            socketId = socket.conn.id;
+//            user.socketId = socketId;
+//            //console.log(socketId + ': Connected');
 
-            socket.on('hi2nd', function (name) {
-                console.log('client called server. 2nd hi.='+name);
-            });
-            socket.on('disconnect', function(name){
-                console.log(name+' disconnected');
+            if (err) {
+                socket.emit('registrationFail', err);
+            }
+//            console.log('user id = ' + user.id);
+            if (user.id === '' || user.id === null || user.id == 'undefined') {
+//                console.log('if');
+                User.findOrCreate({name: user.name}, {name: user.name}).exec(function createCB(err, userData) {
+                    if (err) {
+                        socket.emit('registrationFail', err);
+                    }
+                    //console.log('user id blank');
+                    //console.log(userData);
+
+                    user = userData;
+
+                    //console.log('Now user id = ' + user.id);
+                    User.update({id: user.id}, {id: user.id, socketId: socketId}).exec(function afterwards(err, updated) {
+
+                        if (err) {
+                            socket.emit('registrationFail', err);
+                            //console.log(err);
+                        }
+                        //console.log('socket id updated');
+                        user = updated[0];
+                        //console.log(user);
+
+                        var responseArray = {user: user};
+
+                        socket.emit('registrationSuccessful', responseArray);
+                    });
+                });
+            } else if (user.id != "undefined" && user.id !== "undefined") {
+//                console.log('else If');
+//                console.log(user.id);
+                User.findOrCreate({id: user.id},{name: user.name}).exec(function findOneCB(err, found) {
+                    if (err) {
+                        socket.emit('registrationFail', err);
+                    }
+                    //console.log('not blank');
+//                    console.log(found);
+                    user = found;
+
+                    User.update({id: user.id}, {id: user.id, socketId: socketId}).exec(function afterwards(err, updated) {
+
+                        if (err) {
+                            socket.emit('registrationFail', err);
+                            //console.log(err);
+                        }
+                        //console.log('socket id updated');
+                        user = updated[0];
+//                        console.log('after update');
+//                        console.log(user);
+                        var responseArray = {user: user};
+
+                        socket.emit('registrationSuccessful', responseArray);
+                    });
+
+                });
+            }
+
+//            Game.create({gameArray: game.gameArray}).exec(function createCB(err, created) {
+//                game = created;
+//            });
+
+            socket.on('disconnect', function (name) {
+                console.log('Disconnected : ' + name);
             });
         });
 
+        if (isAjax == 1) {
+            return res.json('Success');
+        }
+
 //        sails.sockets.on('hi', function(name){
-//            console.log('client called server. 1st hi');
+//            //console.log('client called server. 1st hi');
 //        });
 //
 //        sails.sockets.on('hi2nd', function(name){
-//            console.log('client called server. 2nd hi');
+//            //console.log('client called server. 2nd hi');
 //        });
 //
 //        socket.on('disconnect', function(name){
-//            console.log('someone disconnected');
+//            //console.log('someone disconnected');
 //        });
 //
 //        sails.sockets.emit('hi2nd');
@@ -117,7 +190,7 @@ var MainController = {
         });
     },
     startSession: function (req, res) {
-        console.log("starting");
+        //console.log("starting");
         var myResponse = {
             'code': 0,
             'description': 'Success',
@@ -184,4 +257,3 @@ var MainController = {
     }
 };
 module.exports = MainController;
-

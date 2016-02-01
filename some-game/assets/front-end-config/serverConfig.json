@@ -1,5 +1,5 @@
 {
-    "serverAddress": "http://172.16.6.152",
-    "port": "89",
+    "serverAddress": "http://localhost",
+    "port": "1337",
     "registerUser":"register"
 }

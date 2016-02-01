@@ -8,7 +8,7 @@
 module.exports.Game = {
 
     attributes: {
-        'gameId': 'STRING',
+        'id': 'STRING',
         'userArray': {'user1': 'STRING', 'user2': 'STRING'},
         'gameArray': [
             {0: 'STRING', 1: 'STRING', 2: 'STRING'},

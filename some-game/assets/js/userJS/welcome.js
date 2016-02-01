@@ -99,7 +99,7 @@ function registerUser() {
         $('#userName').val('');
 
         // Next page procedure
-        $('#registerDiv').hide("slow", function() {
+        $('#registerDiv').hide("slow", function () {
             $('#userListDiv').show("slow");
         });
 
@@ -114,8 +114,34 @@ function registerUser() {
      * UserList
      */
 
-    socket.on('userList', function (msg) {
-        $('#userListDiv').show("slow");
+    socket.on('userListUpdate', function (userList) {
+
+        document.getElementById("userListDiv").innerHTML = "";
+
+        var length = userList.length;
+
+        for (i = 0; i < length; i++) {
+
+            var input = document.createElement("BUTTON");
+            input.className = "list-group-item";
+            input.type = "button";
+
+            var inputSpan = document.createElement("span");
+            inputSpan.className = "badge";
+            var inputSpanTextNode = document.createTextNode(userList[i].score);
+            inputSpan.appendChild(inputSpanTextNode);
+
+            input.appendChild(inputSpan);
+
+            var inputTextNode = document.createTextNode(userList[i].name);
+            input.appendChild(inputTextNode);
+
+
+            var element = document.getElementById("userListDiv");
+            element.appendChild(input);
+
+        }
+//        $('#userListDiv').show("slow");
     });
 
     /**

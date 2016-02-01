@@ -10,14 +10,7 @@ var MainController = {
     register: function (req, res) {
 
         var params = req.params.all();
-//        var game = {
-//
-//            gameArray: [
-//                {0: '', 1: '', 2: ''},
-//                {0: '', 1: '', 2: ''},
-//                {0: '', 1: '', 2: ''}
-//            ]
-//        };
+        var connectedUsers = [];
         var user = {id: params.userId, name: params.userName, socketId: ''};
         var isAjax = params.isAjax;
         var socketId = null;
@@ -27,7 +20,7 @@ var MainController = {
         socketRequest.on('connection', function (socket, err) {
             socketId = socket.conn.id;
 //            user.socketId = socketId;
-//            //console.log(socketId + ': Connected');
+            console.log(socketId + ': Connected');
 
             if (err) {
                 socket.emit('registrationFail', err);
@@ -58,12 +51,16 @@ var MainController = {
                         var responseArray = {user: user};
 
                         socket.emit('registrationSuccessful', responseArray);
+//                        connectedUsers.push(user);
+                        User.find().exec(function createCB(err, connectedUserData) {
+                            socket.emit('userListUpdate', connectedUserData);
+                        });
                     });
                 });
             } else if (user.id != "undefined" && user.id !== "undefined") {
 //                console.log('else If');
 //                console.log(user.id);
-                User.findOrCreate({id: user.id},{name: user.name}).exec(function findOneCB(err, found) {
+                User.findOrCreate({id: user.id}, {name: user.name}).exec(function findOneCB(err, found) {
                     if (err) {
                         socket.emit('registrationFail', err);
                     }
@@ -84,6 +81,11 @@ var MainController = {
                         var responseArray = {user: user};
 
                         socket.emit('registrationSuccessful', responseArray);
+//                        connectedUsers.push(user);
+                        User.find().exec(function createCB(err, connectedUserData) {
+                            socket.emit('userListUpdate', connectedUserData);
+                        });
+
                     });
 
                 });
@@ -98,9 +100,9 @@ var MainController = {
             });
         });
 
-        if (isAjax == 1) {
-            return res.json('Success');
-        }
+//        if (isAjax == 1) {
+//            return res.json('Success');
+//        }
 
 //        sails.sockets.on('hi', function(name){
 //            //console.log('client called server. 1st hi');
